@@ -67,15 +67,6 @@ fn get_max_color(game: (u32, Vec<(u32, &str)>), color: &str) -> u32 {
     max.0
 }
 
-fn get_max_possible_color(game: (u32, Vec<(u32, &str)>), color: &str, max: u32) -> u32 {
-    let max = game.1
-        .iter()
-        .filter(|x| x.1 == color && x.0 <= max)
-        .max().unwrap();
-
-    max.0
-}
-
 fn get_game_subsets(input: &str) -> (u32, Vec<(u32, &str)>) {
     let game = input.split(":").collect::<Vec<&str>>();
     let game_id = game[0].replace("Game ", "");

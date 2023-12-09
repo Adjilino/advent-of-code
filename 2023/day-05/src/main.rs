@@ -171,6 +171,7 @@ fn get_category_number(
         return vec![(from_category, start_number, end_number)];
     }
 
+    let mut convered_numbers_range: Vec<(usize, usize)> = Vec::new();
     let mut categories_number: Vec<(String, usize, usize)> = Vec::new();
 
     let filtered_map = maps
@@ -187,6 +188,8 @@ fn get_category_number(
             let diff_start = start_number - map.from.start;
             let diff_end = map.from.end - end_number;
 
+            convered_numbers_range.push((start_number, end_number));
+
             categories_number.push((
                 map.to.category.clone(),
                 map.to.start + diff_start,
@@ -195,6 +198,8 @@ fn get_category_number(
         } else {
             if map.from.start <= start_number && map.from.end >= start_number {
                 let diff_start = start_number - map.from.start;
+
+                convered_numbers_range.push((start_number, map.from.end));
 
                 categories_number.push((
                     map.to.category.clone(),
@@ -205,6 +210,8 @@ fn get_category_number(
 
             if map.from.start <= end_number && map.from.end >= end_number {
                 let diff_end = map.from.end - end_number;
+
+                convered_numbers_range.push((map.from.start, end_number));
 
                 categories_number.push((
                     map.to.category.clone(),
@@ -221,6 +228,32 @@ fn get_category_number(
             start_number,
             end_number,
         ));
+    } else {
+        let mut last_start_convered_number = start_number;
+
+        convered_numbers_range.sort_by(|a, b| a.0.cmp(&b.0));
+
+        for (index, convered_number) in convered_numbers_range.iter().enumerate() {
+            if convered_number.0 > last_start_convered_number {
+                categories_number.push((
+                    filtered_map.clone()[0].to.category.clone(),
+                    last_start_convered_number,
+                    convered_number.0 - 1,
+                ));
+            }
+
+            last_start_convered_number = convered_number.1 + 1;
+
+            if index == convered_numbers_range.len() - 1 {
+                if last_start_convered_number <= end_number {
+                    categories_number.push((
+                        filtered_map.clone()[0].to.category.clone(),
+                        last_start_convered_number,
+                        end_number,
+                    ));
+                }
+            }
+        }
     }
 
     let mut final_categories_number: Vec<(String, usize, usize)> = Vec::new();
